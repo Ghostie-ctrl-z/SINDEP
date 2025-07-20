@@ -25,20 +25,37 @@ void showSplash() {
 // Declares a funtion that takes a constant reference to a string( domain name)
 
 
-void runWhois(const std::string& domain) {
+void runWhoisDirect(const std::string& domain) {
+    WSADATA wsa;
 
-	std::string cmd = "whois " + domain;
-	std::cout << "[*] Running WHOIS lookup for: " << domain << "\n\n";
+    SOCKET s;
 
-	int result = system(cmd.c_str()); 
-
-	if (result != 0) {
-		std::cerr << "WHOIS command failed. Make sure 'whois' is installed. \n";
+    struct sockaddr_in server;
+    char buffer[4096];
+    int recv_size;
 
 
-	}
 
-	
+    std::cout << "[*] Running WHOIS lookup for: " << domain << "\n\n";
+
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
+        std::cerr << "[!] Winsock initialization failed. \n";
+        return;
+
+    }
+
+    if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+
+        std::cerr << "[!] Could not create sockets .\n";
+        WSACleanup();
+        return;
+    }
+
+    server.sin_addr.s_addr = inet_addr("199.7.83.42"); // whois.verisign-grs.com
+    server.sin_family = AF_INET;
+    server.sin_port = htons(43);
+
+
 
 
 
@@ -85,6 +102,3 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
-  // -----------------------------------------FUNCTION DEFINITIONS---------------------------------
-
